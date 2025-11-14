@@ -1,0 +1,136 @@
+# Risky scenario: PVCs with Delete reclaim policy (via default storage class)
+# These should be blocked from deletion by pv-safe
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-data
+  namespace: test-risky
+  labels:
+    app: postgres
+    pv-safe-test: "risky"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres
+  namespace: test-risky
+  labels:
+    app: postgres
+spec:
+  containers:
+    - name: postgres
+      image: postgres:15-alpine
+      env:
+        - name: POSTGRES_PASSWORD
+          value: testpassword
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+      volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+      ports:
+        - containerPort: 5432
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: database-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: test-risky
+  labels:
+    app: redis
+    pv-safe-test: "risky"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 512Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis
+  namespace: test-risky
+  labels:
+    app: redis
+spec:
+  containers:
+    - name: redis
+      image: redis:7-alpine
+      volumeMounts:
+        - name: data
+          mountPath: /data
+      ports:
+        - containerPort: 6379
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: redis-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: app-logs
+  namespace: test-risky
+  labels:
+    app: application
+    pv-safe-test: "risky"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-server
+  namespace: test-risky
+  labels:
+    app: application
+spec:
+  containers:
+    - name: app
+      image: nginx:alpine
+      volumeMounts:
+        - name: logs
+          mountPath: /var/log/app
+      ports:
+        - containerPort: 80
+  volumes:
+    - name: logs
+      persistentVolumeClaim:
+        claimName: app-logs
+---
+# Unbound PVC (no pod using it) - still risky
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: unused-data
+  namespace: test-risky
+  labels:
+    pv-safe-test: "risky-unbound"
+  annotations:
+    description: "PVC not bound to any pod"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 100Mi

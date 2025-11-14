@@ -1,0 +1,88 @@
+# Staging environment with smaller resources
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-staging
+  namespace: test-staging
+  labels:
+    app: postgres
+    environment: staging
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres-staging
+  namespace: test-staging
+  labels:
+    app: postgres
+spec:
+  containers:
+    - name: postgres
+      image: postgres:15-alpine
+      env:
+        - name: POSTGRES_PASSWORD
+          value: stagingpass
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+      volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+      ports:
+        - containerPort: 5432
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: postgres-staging
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-staging
+  namespace: test-staging
+  labels:
+    app: minio
+    environment: staging
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: minio-staging
+  namespace: test-staging
+  labels:
+    app: minio
+spec:
+  containers:
+    - name: minio
+      image: minio/minio:latest
+      args:
+        - server
+        - /data
+      env:
+        - name: MINIO_ROOT_USER
+          value: minioadmin
+        - name: MINIO_ROOT_PASSWORD
+          value: minioadmin
+      volumeMounts:
+        - name: data
+          mountPath: /data
+      ports:
+        - containerPort: 9000
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: minio-staging

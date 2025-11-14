@@ -1,0 +1,23 @@
+apiVersion: v2
+name: pv-safe
+description: A Kubernetes admission webhook that prevents accidental data loss from PersistentVolume deletions
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - kubernetes
+  - storage
+  - persistentvolume
+  - admission-webhook
+  - data-protection
+home: https://github.com/automationpi/pv-safe
+sources:
+  - https://github.com/automationpi/pv-safe
+maintainers:
+  - name: pv-safe maintainers
+    url: https://github.com/automationpi/pv-safe
+icon: https://raw.githubusercontent.com/automationpi/pv-safe/main/docs/assets/logo.png
+annotations:
+  artifacthub.io/category: storage
+  artifacthub.io/operator: "true"
+  artifacthub.io/operatorCapabilities: Basic Install

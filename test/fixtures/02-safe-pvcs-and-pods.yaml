@@ -1,0 +1,74 @@
+# Safe scenario: PVCs with Retain reclaim policy
+# These should be allowed to be deleted (though PV will remain)
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backup-data
+  namespace: test-safe
+  labels:
+    app: backup
+    pv-safe-test: "safe"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard-retain
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: backup-server
+  namespace: test-safe
+  labels:
+    app: backup
+spec:
+  containers:
+    - name: backup
+      image: alpine:latest
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      volumeMounts:
+        - name: data
+          mountPath: /backups
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: backup-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: archive-data
+  namespace: test-safe
+  labels:
+    app: archive
+    pv-safe-test: "safe"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard-retain
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: archive-server
+  namespace: test-safe
+  labels:
+    app: archive
+spec:
+  containers:
+    - name: archive
+      image: alpine:latest
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      volumeMounts:
+        - name: data
+          mountPath: /archive
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: archive-data

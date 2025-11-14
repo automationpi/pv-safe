@@ -1,0 +1,41 @@
+{{- if .Values.certificate.enabled }}
+{{- if .Values.certificate.issuer.create }}
+apiVersion: cert-manager.io/v1
+kind: {{ .Values.certificate.issuer.kind }}
+metadata:
+  name: {{ include "pv-safe.issuerName" . }}
+  namespace: {{ include "pv-safe.namespace" . }}
+  labels:
+    {{- include "pv-safe.labels" . | nindent 4 }}
+spec:
+  selfSigned: {}
+---
+{{- end }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "pv-safe.fullname" . }}-webhook-cert
+  namespace: {{ include "pv-safe.namespace" . }}
+  labels:
+    {{- include "pv-safe.labels" . | nindent 4 }}
+spec:
+  secretName: {{ include "pv-safe.fullname" . }}-webhook-cert
+  duration: {{ .Values.certificate.duration }}
+  renewBefore: {{ .Values.certificate.renewBefore }}
+  subject:
+    organizations:
+      - pv-safe
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - server auth
+    - client auth
+  dnsNames:
+    {{- toYaml .Values.certificate.dnsNames | nindent 4 }}
+  issuerRef:
+    kind: {{ .Values.certificate.issuer.kind }}
+    name: {{ include "pv-safe.issuerName" . }}
+{{- end }}

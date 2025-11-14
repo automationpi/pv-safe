@@ -1,0 +1,58 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: {{ include "pv-safe.fullname" . }}-validating-webhook
+  labels:
+    {{- include "pv-safe.labels" . | nindent 4 }}
+  annotations:
+    {{- if .Values.certificate.enabled }}
+    cert-manager.io/inject-ca-from: {{ include "pv-safe.namespace" . }}/{{ include "pv-safe.fullname" . }}-webhook-cert
+    {{- end }}
+webhooks:
+  - name: validate.pv-safe.io
+    admissionReviewVersions:
+      - v1
+    clientConfig:
+      service:
+        name: {{ include "pv-safe.fullname" . }}-webhook
+        namespace: {{ include "pv-safe.namespace" . }}
+        path: /validate
+        port: 443
+      {{- if not .Values.certificate.enabled }}
+      caBundle: {{ .Values.webhook.caBundle | b64enc }}
+      {{- end }}
+    failurePolicy: {{ .Values.validatingWebhook.failurePolicy }}
+    matchPolicy: Exact
+    {{- with .Values.validatingWebhook.namespaceSelector }}
+    namespaceSelector:
+      {{- if .additionalExcludedNamespaces }}
+      matchExpressions:
+        - key: name
+          operator: NotIn
+          values:
+            {{- range .matchExpressions }}
+            {{- range .values }}
+            - {{ . }}
+            {{- end }}
+            {{- end }}
+            {{- range $.Values.validatingWebhook.additionalExcludedNamespaces }}
+            - {{ . }}
+            {{- end }}
+      {{- else }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+    {{- end }}
+    rules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - DELETE
+        resources:
+          - namespaces
+          - persistentvolumeclaims
+          - persistentvolumes
+        scope: '*'
+    sideEffects: None
+    timeoutSeconds: {{ .Values.validatingWebhook.timeoutSeconds }}

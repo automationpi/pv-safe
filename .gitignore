@@ -1,0 +1,221 @@
+# Binaries and executables
+/bin/
+/dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+pv-safe
+webhook
+
+# Go build artifacts
+*.test
+*.out
+/vendor/
+go.work
+go.work.sum
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.coverprofile
+coverage.txt
+coverage.html
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE and editor files
+.vscode/
+.idea/
+.claude/
+*.swp
+*.swo
+*~
+.DS_Store
+*.bak
+.project
+.settings/
+.classpath
+
+# Kubernetes and cluster files
+kubeconfig
+kubeconfig.*
+*.kubeconfig
+.kube/
+
+# Local development and testing
+.env
+.env.local
+.env.*.local
+*.log
+logs/
+*.pid
+
+# Docker and container artifacts
+*.tar
+*.tar.gz
+docker-compose.override.yml
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+.cache/
+
+# Build output
+build/
+out/
+
+# Helm charts
+charts/*/charts/
+charts/*/*.tgz
+*.tgz
+Chart.lock
+
+# Certificate files (for local testing)
+*.key
+*.crt
+*.pem
+*.csr
+tls.key
+tls.crt
+ca.crt
+ca.key
+
+# Backup files
+*.backup
+*-backup
+*.old
+
+# Scratch and notes files
+scratch/
+notes/
+TODO.local
+NOTES.local
+
+# OS specific
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# Terraform (if used)
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Planning and implementation artifacts
+# Temporary notes created during development
+*_NOTES.md
+*_COMPLETE.md
+*_STEP*.md
+QUICK_START.md
+CLUSTER_SETUP_NOTES.md
+WEBHOOK_STEP*.md
+BYPASS_FEATURE_COMPLETE.md
+IMPLEMENTATION_PLAN.md
+requirements.md
+TEST_ENVIRONMENT.md
+
+# Deployment manifests (use Helm chart instead)
+deploy/
+
+# Local test data
+test-data/
+test-results/
+
+# Generated documentation (if auto-generated)
+# docs/api/
+# docs/generated/
+
+# Profiling data
+*.pprof
+cpu.prof
+mem.prof
+
+# Debug files
+debug
+debug.test
+__debug_bin
+
+# Local scripts not meant for version control
+local-*.sh
+test-local.sh
+dev-*.sh
+
+# Kind cluster state (if persisted locally)
+.kind/
+
+# Temporary patches
+*.patch
+*.diff
+
+# Editor backup files
+\#*\#
+.\#*
+
+# Python virtual environments (if any Python tooling is used)
+venv/
+.venv/
+env/
+ENV/
+*.pyc
+__pycache__/
+
+# Node modules (if any Node.js tooling is used)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Compiled binary addons
+*.node
+
+# Lock files for dependencies (uncomment if you want to exclude)
+# go.sum
+
+# AIR live reload (if used for Go development)
+tmp/
+.air.toml
+
+# Delve debugger
+__debug_bin*
+
+# GoReleaser
+dist/
+goreleaser.yaml
+
+# Local Makefile overrides
+Makefile.local
+
+# Secrets and sensitive data
+secrets/
+*.secret
+credentials.json
+service-account.json
+token
+*.token
+
+# Database files (if any local DBs are used)
+*.db
+*.sqlite
+*.sqlite3
+
+# Archives
+*.zip
+*.rar
+*.7z
+
+# CI/CD local artifacts
+.github/workflows/*.local
+
+# Custom ignore patterns specific to development workflow
+experiments/
+sandbox/
+playground/

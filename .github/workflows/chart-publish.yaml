@@ -1,0 +1,53 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'charts/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: latest
+
+      - name: Log in to Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Package and push chart
+        run: |
+          cd charts
+          helm package pv-safe
+          helm push pv-safe-*.tgz oci://ghcr.io/${{ github.repository_owner }}
+
+      - name: Update chart index (GitHub Pages)
+        run: |
+          git checkout gh-pages 2>/dev/null || git checkout --orphan gh-pages
+          git rm -rf . || true
+          git checkout main -- charts/
+          helm package charts/pv-safe -d .
+          helm repo index . --url https://${{ github.repository_owner }}.github.io/pv-safe
+          git add .
+          git commit -m "Update Helm chart index [skip ci]" || true
+          git push origin gh-pages --force

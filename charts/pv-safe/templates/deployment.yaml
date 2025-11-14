@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pv-safe.fullname" . }}-webhook
+  namespace: {{ include "pv-safe.namespace" . }}
+  labels:
+    {{- include "pv-safe.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.webhook.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "pv-safe.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pv-safe.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/certificate.yaml") . | sha256sum }}
+    spec:
+      {{- with .Values.webhook.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "pv-safe.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.webhook.podSecurityContext | nindent 8 }}
+      containers:
+        - name: webhook
+          securityContext:
+            {{- toYaml .Values.webhook.securityContext | nindent 12 }}
+          image: "{{ .Values.webhook.image.repository }}:{{ .Values.webhook.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.webhook.image.pullPolicy }}
+          args:
+            - --port={{ .Values.webhook.port }}
+            - --cert-file=/etc/webhook/certs/tls.crt
+            - --key-file=/etc/webhook/certs/tls.key
+          ports:
+            - name: https
+              containerPort: {{ .Values.webhook.port }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.webhook.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.webhook.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.webhook.resources | nindent 12 }}
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: {{ include "pv-safe.fullname" . }}-webhook-cert
+      {{- with .Values.webhook.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhook.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.webhook.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

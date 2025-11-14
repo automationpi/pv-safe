@@ -1,0 +1,205 @@
+# Production-like namespace with multiple services
+# Simulates a more realistic scenario
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-master-data
+  namespace: test-production
+  labels:
+    app: mysql
+    role: master
+    tier: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql-master
+  namespace: test-production
+  labels:
+    app: mysql
+    role: master
+spec:
+  containers:
+    - name: mysql
+      image: mysql:8.0
+      env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: rootpassword
+      volumeMounts:
+        - name: data
+          mountPath: /var/lib/mysql
+      ports:
+        - containerPort: 3306
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: mysql-master-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-replica-data
+  namespace: test-production
+  labels:
+    app: mysql
+    role: replica
+    tier: database
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql-replica
+  namespace: test-production
+  labels:
+    app: mysql
+    role: replica
+spec:
+  containers:
+    - name: mysql
+      image: mysql:8.0
+      env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: rootpassword
+      volumeMounts:
+        - name: data
+          mountPath: /var/lib/mysql
+      ports:
+        - containerPort: 3306
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: mysql-replica-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-data-0
+  namespace: test-production
+  labels:
+    app: elasticsearch
+    tier: search
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: elasticsearch-0
+  namespace: test-production
+  labels:
+    app: elasticsearch
+spec:
+  containers:
+    - name: elasticsearch
+      image: elasticsearch:8.11.0
+      env:
+        - name: discovery.type
+          value: single-node
+        - name: ES_JAVA_OPTS
+          value: "-Xms512m -Xmx512m"
+        - name: xpack.security.enabled
+          value: "false"
+      volumeMounts:
+        - name: data
+          mountPath: /usr/share/elasticsearch/data
+      ports:
+        - containerPort: 9200
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: elasticsearch-data-0
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-data
+  namespace: test-production
+  labels:
+    app: rabbitmq
+    tier: messaging
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rabbitmq
+  namespace: test-production
+  labels:
+    app: rabbitmq
+spec:
+  containers:
+    - name: rabbitmq
+      image: rabbitmq:3-management-alpine
+      volumeMounts:
+        - name: data
+          mountPath: /var/lib/rabbitmq
+      ports:
+        - containerPort: 5672
+        - containerPort: 15672
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: rabbitmq-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-data
+  namespace: test-production
+  labels:
+    app: prometheus
+    tier: monitoring
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 15Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prometheus
+  namespace: test-production
+  labels:
+    app: prometheus
+spec:
+  containers:
+    - name: prometheus
+      image: prom/prometheus:latest
+      volumeMounts:
+        - name: data
+          mountPath: /prometheus
+      ports:
+        - containerPort: 9090
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: prometheus-data

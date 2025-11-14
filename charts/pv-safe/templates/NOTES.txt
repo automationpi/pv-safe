@@ -1,0 +1,59 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+pv-safe is now protecting your cluster from accidental PersistentVolume data loss.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }} -n {{ .Release.Namespace }}
+  $ helm get all {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+{{- if .Values.certificate.enabled }}
+
+Certificate management:
+  cert-manager is handling TLS certificates automatically.
+  Certificate: {{ include "pv-safe.fullname" . }}-webhook-cert
+  Namespace: {{ include "pv-safe.namespace" . }}
+{{- else }}
+
+WARNING: cert-manager is disabled. Ensure you have provided a valid TLS certificate.
+{{- end }}
+
+Webhook status:
+  Check webhook pods:
+    kubectl get pods -n {{ include "pv-safe.namespace" . }} -l app=pv-safe-webhook
+
+  View webhook logs:
+    kubectl logs -n {{ include "pv-safe.namespace" . }} -l app=pv-safe-webhook -f
+
+Webhook configuration:
+  Failure Policy: {{ .Values.validatingWebhook.failurePolicy }}
+  Timeout: {{ .Values.validatingWebhook.timeoutSeconds }}s
+  Replicas: {{ .Values.webhook.replicaCount }}
+
+How it works:
+  pv-safe intercepts DELETE operations on:
+  - Namespaces
+  - PersistentVolumeClaims (PVCs)
+  - PersistentVolumes (PVs)
+
+  Deletions are blocked if:
+  - PV has Delete reclaim policy AND
+  - No ready VolumeSnapshot with Retain policy exists
+
+Test the webhook:
+  Try deleting a PVC with Delete reclaim policy:
+    kubectl delete pvc <pvc-name> -n <namespace>
+
+  You should see a detailed error message with remediation steps.
+
+Documentation:
+  Operator Guide: https://github.com/automationpi/pv-safe/blob/main/docs/OPERATOR_GUIDE.md
+  Quick Reference: https://github.com/automationpi/pv-safe/blob/main/docs/QUICK_REFERENCE.md
+
+Support:
+  Issues: https://github.com/automationpi/pv-safe/issues
+  Discussions: https://github.com/automationpi/pv-safe/discussions
+
+Happy protecting your data!
