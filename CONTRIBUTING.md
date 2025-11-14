@@ -185,8 +185,9 @@ Test end-to-end scenarios in a local cluster:
 
 Update relevant documentation:
 - `README.md` - For user-facing changes
-- `docs/OPERATOR_GUIDE.md` - For operational changes
-- `docs/QUICK_REFERENCE.md` - For new commands or patterns
+- `docs/ARCHITECTURE.md` - For design or architectural changes
+- `docs/DEVELOPMENT.md` - For development workflow changes
+- `docs/TROUBLESHOOTING.md` - For common issues and solutions
 
 ### Examples
 

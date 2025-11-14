@@ -244,10 +244,9 @@ deletionPolicy: Retain
 
 ## Documentation
 
-- **[Operator Guide](docs/OPERATOR_GUIDE.md)** - Complete installation, configuration, and troubleshooting guide
-- **[Quick Reference](docs/QUICK_REFERENCE.md)** - Command cheat sheet and common operations
-- **[Implementation Plan](IMPLEMENTATION_PLAN.md)** - Development roadmap and architecture
-- **[Requirements](requirements.md)** - Functional and technical specifications
+- **[Architecture](docs/ARCHITECTURE.md)** - Internal design and how pv-safe works
+- **[Development](docs/DEVELOPMENT.md)** - Local setup, testing, and contributing
+- **[Troubleshooting](docs/TROUBLESHOOTING.md)** - Common issues and solutions
 
 ## Monitoring
 
