@@ -32,13 +32,12 @@ pv-safe acts as a safety gate for Kubernetes storage operations, automatically b
 # Install cert-manager if not already installed
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
 
-# Install pv-safe from OCI registry
-helm install pv-safe oci://ghcr.io/automationpi/pv-safe --version 0.1.0
+# Wait for cert-manager to be ready
+kubectl wait --for=condition=available --timeout=300s \
+  deployment/cert-manager -n cert-manager
 
-# Or install from source
-git clone https://github.com/automationpi/pv-safe.git
-cd pv-safe
-helm install pv-safe ./charts/pv-safe
+# Install pv-safe from GitHub Release
+helm install pv-safe https://github.com/automationpi/pv-safe/releases/download/v0.1.0/pv-safe-0.1.0.tgz
 
 # Verify installation
 kubectl get pods -n pv-safe-system
