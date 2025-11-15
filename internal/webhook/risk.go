@@ -268,7 +268,7 @@ func (rc *RiskCalculator) buildSuggestions(namespace string, riskyPVCs []RiskyPV
 		sb.WriteString(fmt.Sprintf("     kubectl patch pv %s -p '{\"spec\":{\"persistentVolumeReclaimPolicy\":\"Retain\"}}'\n", risky.PVName))
 	}
 
-	sb.WriteString(fmt.Sprintf("\n  3. OR force delete (will lose data):\n"))
+	sb.WriteString("\n  3. OR force delete (will lose data):\n")
 	sb.WriteString(fmt.Sprintf("     kubectl label namespace %s pv-safe.io/force-delete=true\n", namespace))
 	sb.WriteString(fmt.Sprintf("     kubectl delete namespace %s\n", namespace))
 
