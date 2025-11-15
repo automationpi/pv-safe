@@ -27,7 +27,6 @@ linters:
     - ineffassign
     - misspell
     - nakedret
-    - shadow
     - staticcheck
     - stylecheck
     - typecheck
