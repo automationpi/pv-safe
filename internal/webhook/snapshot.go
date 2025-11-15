@@ -12,6 +12,11 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+const (
+	// UnknownDeletionPolicy represents an unknown or unset deletion policy
+	UnknownDeletionPolicy = "Unknown"
+)
+
 // SnapshotChecker checks for VolumeSnapshots
 type SnapshotChecker struct {
 	dynamicClient dynamic.Interface
@@ -39,13 +44,13 @@ var volumeSnapshotGVR = schema.GroupVersionResource{
 
 // SnapshotInfo contains information about a VolumeSnapshot
 type SnapshotInfo struct {
-	Name             string
-	Namespace        string
-	SourcePVC        string
-	IsReady          bool
-	DeletionPolicy   string
-	CreationTime     metav1.Time
-	RestoreSize      string
+	Name           string
+	Namespace      string
+	SourcePVC      string
+	IsReady        bool
+	DeletionPolicy string
+	CreationTime   metav1.Time
+	RestoreSize    string
 }
 
 // HasReadySnapshot checks if a PVC has a Ready VolumeSnapshot with Retain policy
@@ -72,7 +77,7 @@ func (sc *SnapshotChecker) HasReadySnapshot(ctx context.Context, namespace, pvcN
 		}
 
 		// Get deletion policy from VolumeSnapshotClass if possible
-		deletionPolicy := "Unknown"
+		deletionPolicy := UnknownDeletionPolicy
 		snapshotClassName, found, _ := unstructured.NestedString(snapshot, "spec", "volumeSnapshotClassName")
 		if found && snapshotClassName != "" {
 			policy, err := sc.getSnapshotClassDeletionPolicy(ctx, snapshotClassName)
@@ -123,7 +128,7 @@ func (sc *SnapshotChecker) getSnapshotClassDeletionPolicy(ctx context.Context, c
 
 	policy, found, err := unstructured.NestedString(class.Object, "deletionPolicy")
 	if err != nil || !found {
-		return "Unknown", nil
+		return UnknownDeletionPolicy, nil
 	}
 
 	return policy, nil
@@ -149,7 +154,7 @@ func (sc *SnapshotChecker) ListSnapshots(ctx context.Context, namespace, pvcName
 
 		ready, _, _ := unstructured.NestedBool(snapshot, "status", "readyToUse")
 
-		deletionPolicy := "Unknown"
+		deletionPolicy := UnknownDeletionPolicy
 		snapshotClassName, found, _ := unstructured.NestedString(snapshot, "spec", "volumeSnapshotClassName")
 		if found && snapshotClassName != "" {
 			policy, err := sc.getSnapshotClassDeletionPolicy(ctx, snapshotClassName)

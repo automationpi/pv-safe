@@ -12,20 +12,20 @@ import (
 
 // RiskAssessment contains the result of analyzing deletion risk
 type RiskAssessment struct {
-	IsRisky      bool
-	RiskyPVCs    []RiskyPVC
-	Message      string
-	Suggestion   string
+	IsRisky    bool
+	RiskyPVCs  []RiskyPVC
+	Message    string
+	Suggestion string
 }
 
 // RiskyPVC represents a PVC that would lose data if deleted
 type RiskyPVC struct {
-	Name           string
-	Namespace      string
-	PVName         string
-	Reason         string
-	HasSnapshot    bool
-	SnapshotInfo   string
+	Name         string
+	Namespace    string
+	PVName       string
+	Reason       string
+	HasSnapshot  bool
+	SnapshotInfo string
 }
 
 // RiskCalculator analyzes deletion risk for PVs and PVCs

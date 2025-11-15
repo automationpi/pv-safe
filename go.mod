@@ -1,6 +1,6 @@
 module github.com/automationpi/pv-safe
 
-go 1.24.0
+go 1.21
 
 toolchain go1.24.10
 

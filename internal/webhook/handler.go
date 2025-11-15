@@ -21,6 +21,7 @@ import (
 
 const (
 	// BypassLabel is the label that allows forcing deletion
+	//nolint:gosec // G101: This is a label name, not a credential
 	BypassLabel = "pv-safe.io/force-delete"
 )
 
@@ -278,9 +279,9 @@ func (h *Handler) hasBypassLabel(request *admissionv1.AdmissionRequest) bool {
 //   - request: The admission request containing deletion details
 func (h *Handler) logDeletion(request *admissionv1.AdmissionRequest) {
 	// Extract key information from the request
-	kind := request.Kind.Kind      // Type of resource being deleted
-	namespace := request.Namespace // Namespace (empty for cluster-scoped resources)
-	name := request.Name           // Name of the resource
+	kind := request.Kind.Kind         // Type of resource being deleted
+	namespace := request.Namespace    // Namespace (empty for cluster-scoped resources)
+	name := request.Name              // Name of the resource
 	user := request.UserInfo.Username // User attempting the deletion
 
 	// Provide detailed, resource-specific logging for critical resources

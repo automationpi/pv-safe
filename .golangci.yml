@@ -1,6 +1,4 @@
 linters-settings:
-  govet:
-    check-shadowing: true
   gocyclo:
     min-complexity: 15
   dupl:
@@ -16,7 +14,6 @@ linters:
     - dogsled
     - dupl
     - errcheck
-    - exportloopref
     - gochecknoinits
     - goconst
     - gocritic
@@ -30,6 +27,7 @@ linters:
     - ineffassign
     - misspell
     - nakedret
+    - shadow
     - staticcheck
     - stylecheck
     - typecheck

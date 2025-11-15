@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/automationpi/pv-safe/internal/webhook"
 )
@@ -51,8 +52,9 @@ func main() {
 	mux.HandleFunc("/readyz", handler.HealthCheck)
 
 	server := &http.Server{
-		Addr:    ":" + *port,
-		Handler: mux,
+		Addr:              ":" + *port,
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
 		TLSConfig: &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		},
