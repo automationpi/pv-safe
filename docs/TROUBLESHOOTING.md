@@ -561,7 +561,7 @@ kubectl patch validatingwebhookconfiguration pv-safe-validating-webhook \
 Re-enable after issue is resolved:
 ```bash
 # Redeploy webhook
-helm upgrade pv-safe oci://ghcr.io/automationpi/pv-safe
+helm upgrade pv-safe https://github.com/automationpi/pv-safe/releases/latest/download/pv-safe-0.1.0.tgz
 
 # Or re-apply manifests
 kubectl apply -f deploy/
